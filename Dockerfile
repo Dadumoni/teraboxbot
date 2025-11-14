@@ -20,12 +20,13 @@ COPY terabot.py .
 # Create download directory
 RUN mkdir -p /tmp/aria2_downloads
 
-# Create startup script
+# Create startup script that uses environment variables
 RUN echo '#!/bin/bash\n\
-aria2c --enable-rpc --rpc-listen-all --rpc-secret=mysecret \
---dir=/tmp/aria2_downloads --continue=true \
+aria2c --enable-rpc --rpc-listen-all --rpc-secret=${ARIA2_SECRET:-mysecret} \
+--dir=${DOWNLOAD_DIR:-/tmp/aria2_downloads} --continue=true \
 --max-concurrent-downloads=5 --max-connection-per-server=10 \
 --split=10 --daemon=true\n\
+sleep 2\n\
 python terabot.py' > /app/start.sh && chmod +x /app/start.sh
 
 # Expose port (optional, for health checks)
